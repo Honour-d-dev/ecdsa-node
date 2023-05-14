@@ -4,6 +4,7 @@ import server from "./server";
 function Transfer({ address, setBalance }) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
+  const [signature, setSignature] = useState("");
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
@@ -16,6 +17,7 @@ function Transfer({ address, setBalance }) {
       } = await server.post(`send`, {
         sender: address,
         amount: parseInt(sendAmount),
+        signature: signature,
         recipient,
       });
       setBalance(balance);
@@ -27,6 +29,15 @@ function Transfer({ address, setBalance }) {
   return (
     <form className="container transfer" onSubmit={transfer}>
       <h1>Send Transaction</h1>
+
+      <label>
+        signature
+        <input
+          placeholder="put your signature here"
+          value={signature}
+          onChange={setValue(setSignature)}
+        ></input>
+      </label>
 
       <label>
         Send Amount

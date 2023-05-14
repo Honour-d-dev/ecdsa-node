@@ -1,3 +1,4 @@
+const validSignature = require("c:/Users/hp/week-1-test/ecdsa-node/server/scripts/validSignature");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -7,9 +8,9 @@ app.use(cors());
 app.use(express.json());
 
 const balances = {
-  "0x1": 100,
-  "0x2": 50,
-  "0x3": 75,
+  "03bf83a37745ea180dd63deeaa86091b5f593269571132b2201f86ebb269054312": 100,
+  "025e2aaa4d0442fa880ffecbd72107828661421005a4ef29f56147338531c08467": 50,
+  "0260de4c0fd6eb9ababe30159d791b1a84603b8caeba77860de91c10fb7b097775": 75,
 };
 
 app.get("/balance/:address", (req, res) => {
@@ -19,12 +20,15 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount } = req.body;
+  const { sender, amount, signature, recipient } = req.body;
 
   setInitialBalance(sender);
   setInitialBalance(recipient);
 
-  if (balances[sender] < amount) {
+  if(!validSignature(signature, sender)) {
+    res.status(400).send({ message: "invalid Signature"});
+  }
+  else if (balances[sender] < amount) {
     res.status(400).send({ message: "Not enough funds!" });
   } else {
     balances[sender] -= amount;
